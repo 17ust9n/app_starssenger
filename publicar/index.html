@@ -139,6 +139,39 @@
   #hang{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;background:var(--red);color:#fff;border:0;border-radius:30px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;z-index:10}
   #addcall{position:absolute;top:14px;left:14px;z-index:6;background:rgba(0,0,0,.45);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:26px;line-height:1;cursor:pointer}
   
+
+
+/* Agregá esto antes de cerrar tu etiqueta </style> */
+#incall {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 440px;
+  background: var(--navy2);
+  border: 2px solid var(--green);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: none; /* Controlado dinámicamente */
+  align-items: center;
+  gap: 12px;
+  z-index: 9999; /* Fuerza a que se dibuje por encima de cualquier .screen */
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+#incall .sp { flex: 1; }
+#incall button {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+#incall .acc { background: var(--green); color: #04240f; }
+#incall .dec { background: var(--red); color: #fff; }
+
+
+
   /* MODALES REPARADOS */
   .modal{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
   .modal.on{display:flex}
@@ -737,13 +770,51 @@ function startRing(){
 function stopRing(){if(ringTimer){clearInterval(ringTimer);ringTimer=null;}if(navigator.vibrate)navigator.vibrate(0);}
 function notifyCall(name){try{if('Notification' in window&&Notification.permission==='granted'){const n=new Notification('Starssenger',{body:name+' te está llamando 📞',tag:'sp-call',requireInteraction:true});n.onclick=()=>{window.focus();n.close();};}}catch(e){}}
 function askNotif(){try{if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();}catch(e){}}
+
+
+
 function incomingInvite(conv,m){
-  if(inCall)return; // ocupado en otra llamada
+  if(inCall) return; // ocupado en otra llamada
+  
+  // Mantenemos tu asignación de datos exacta
   pendingCall={conv,from:m.from,mode:m.mode||'video',room:m.room};
+  
+  // Seteamos el texto usando tus funciones nativas (como nameFor)
   document.getElementById('icName').textContent=nameFor(m.from)+(pendingCall.mode==='audio'?' te llama (voz)':' te llama (video)');
+  
+  // Forzamos a mostrar el banner (que con el CSS nuevo se va a ver arriba de todo)
   document.getElementById('incall').style.display='flex';
-  startRing();notifyCall(nameFor(m.from));
+  
+  // Disparamos tus alertas sonoras y de vibración
+  startRing();
+  notifyCall(nameFor(m.from));
+  
+  // 📲 SOLUCIÓN CELULARES: Lanzamos el aviso táctil inmediato para burlar el bloqueo de Safari/Chrome
+  setTimeout(() => {
+    const modoTexto = pendingCall.mode === 'audio' ? 'Llamada de voz' : 'Videollamada';
+    if (confirm("📞 " + nameFor(m.from) + " te está haciendo una " + modoTexto + ".\n\n¿Querés contestar?")) {
+      // Si el receptor presiona "Aceptar", limpiamos las alertas y disparamos tu contestador WebRTC
+      stopRing();
+      document.getElementById('incall').style.display='none';
+      
+      // Verificamos si existe la función antes de llamarla
+      if (typeof answerCall === 'function') {
+        answerCall();
+      } else {
+        // En caso de que uses otro método de respuesta en tu script (ejemplo: acceptCall)
+        // Colocá acá la función nativa que conecte los Peers
+      }
+    } else {
+      // Si presiona "Cancelar", ejecuta tu rechazo nativo
+      stopRing();
+      document.getElementById('incall').style.display='none';
+      if (typeof declineCall === 'function') declineCall();
+    }
+  }, 150); // Pequeña pausa milimétrica para dejar que el DOM reaccione
 }
+
+
+
 async function vsig(m){
   if(!inCall)return;
   if(m.t==='hello'){
