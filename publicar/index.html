@@ -141,75 +141,45 @@
   
 
 
-/* Agregá esto antes de cerrar tu etiqueta </style> */
-#incall {
-  position: fixed;
-  top: 14px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 440px;
-  background: var(--navy2);
-  border: 2px solid var(--green);
-  border-radius: 14px;
-  padding: 14px 16px;
-  display: none; /* Controlado dinámicamente */
-  align-items: center;
-  gap: 12px;
-  z-index: 9999; /* Fuerza a que se dibuje por encima de cualquier .screen */
-  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-}
-#incall .sp { flex: 1; }
-#incall button {
-  padding: 8px 14px;
-  border: 0;
-  border-radius: 8px;
-  font-weight: 700;
-  cursor: pointer;
-}
-#incall .acc { background: var(--green); color: #04240f; }
-#incall .dec { background: var(--red); color: #fff; }
+  /* NOTIFICACIÓN DE LLAMADA ENTRANTE (Flota por encima de las pantallas) */
+  #incall { 
+    position: fixed; 
+    top: 14px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 90%; 
+    max-width: 440px; 
+    background: var(--navy2); 
+    border: 2px solid var(--green); 
+    border-radius: 14px; 
+    padding: 14px 16px; 
+    display: none; 
+    align-items: center; 
+    gap: 12px; 
+    z-index: 9999; 
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6); 
+  } 
+  #incall .sp { flex: 1; } 
+  #incall button { padding: 8px 14px; border: 0; border-radius: 8px; font-weight: 700; cursor: pointer; } 
+  #incall .acc { background: var(--green); color: #04240f; } 
+  #incall .dec { background: var(--red); color: #fff; } 
+
+  /* MODALES REPARADOS */ 
+  .modal{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:16px} 
+  .modal.on{display:flex} 
+  .card{background:var(--navy2);border:1px solid var(--line);border-radius:16px;padding:20px;width:100%;max-width:400px} 
+  .mrow{display:flex;gap:10px;margin-top:16px} 
+
+  /* BOTONES DE ACCIÓN EN EL RENDER */ 
+  .contact-actions { display: flex; gap: 6px; margin-left: auto; flex: none; z-index: 10; } 
+  .c-btn { background: none; border: 1px solid var(--line); color: var(--mut); padding: 6px 10px; border-radius: 6px; font-size: 14px; cursor: pointer; line-height: 1; transition: all 0.2s ease; } 
+  .c-btn:active { transform: scale(0.95); } 
+  .c-btn.edit:hover { border-color: var(--green); color: var(--green); background: rgba(33, 195, 111, 0.1); } 
+  .c-btn.delete:hover { border-color: var(--red); color: var(--red); background: rgba(192, 57, 43, 0.15); }
 
 
 
-  /* MODALES REPARADOS */
-  .modal{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
-  .modal.on{display:flex}
-  .card{background:var(--navy2);border:1px solid var(--line);border-radius:16px;padding:20px;width:100%;max-width:400px}
-  .mrow{display:flex;gap:10px;margin-top:16px}
 
-  /* BOTONES DE ACCIÓN EN EL RENDER */
-  .contact-actions {
-    display: flex;
-    gap: 6px;
-    margin-left: auto;
-    flex: none;
-    z-index: 10;
-  }
-  .c-btn {
-    background: none;
-    border: 1px solid var(--line);
-    color: var(--mut);
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    line-height: 1;
-    transition: all 0.2s ease;
-  }
-  .c-btn:active {
-    transform: scale(0.95);
-  }
-  .c-btn.edit:hover {
-    border-color: var(--green);
-    color: var(--green);
-    background: rgba(33, 195, 111, 0.1);
-  }
-  .c-btn.delete:hover {
-    border-color: var(--red);
-    color: var(--red);
-    background: rgba(192, 57, 43, 0.15);
-  }
 </style>
 
 
