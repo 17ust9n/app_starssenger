@@ -5,12 +5,49 @@
 <style>
   :root{--navy:#0B1F33;--navy2:#12314E;--green:#21C36F;--mut:#8aa0b3;--line:#24455f;--red:#c0392b}
   *{box-sizing:border-box;font-family:-apple-system,Segoe UI,Roboto,sans-serif}
-  html,body{margin:0;height:100dvh;background:var(--navy);color:#eaf2f8;overflow:hidden}
-  .wrap{max-width:520px;margin:auto;height:100vh;position:relative;overflow:hidden}
   
-  /* PANTALLAS DE LA APP (Estructural) */
-  .screen{position:absolute;inset:0;display:none;flex-direction:column;background:var(--navy);z-index:1}
-  .screen.on{display:flex}
+  /* REPARACIÓN PARA PANTALLAS MÓVILES (Evita el desplazamiento por barras de navegador) */
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    height: -webkit-fill-available;
+    background: var(--navy);
+    color: #eaf2f8;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+  }
+  
+  .wrap {
+    max-width: 520px;
+    margin: auto;
+    height: 100%;
+    height: -webkit-fill-available;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* PANTALLAS (Ajustadas para no desbordarse) */
+  .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    flex-direction: column;
+    background: var(--navy);
+    z-index: 1;
+    overflow: hidden;
+  }
+  .screen.on {
+    display: flex;
+  }
   
   header{padding:12px 14px;background:var(--navy2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;min-height:56px}
   header b{font-size:18px}
@@ -102,13 +139,13 @@
   #hang{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;background:var(--red);color:#fff;border:0;border-radius:30px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;z-index:10}
   #addcall{position:absolute;top:14px;left:14px;z-index:6;background:rgba(0,0,0,.45);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:26px;line-height:1;cursor:pointer}
   
-  /* MODALES REPARADOS (Estaban colapsados) */
+  /* MODALES REPARADOS */
   .modal{position:absolute;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
   .modal.on{display:flex}
   .card{background:var(--navy2);border:1px solid var(--line);border-radius:16px;padding:20px;width:100%;max-width:400px}
   .mrow{display:flex;gap:10px;margin-top:16px}
 
-  /* BOTONES DE EDICIÓN Y BORRADO EN LA FILA */
+  /* BOTONES DE ACCIÓN EN EL RENDER */
   .contact-actions {
     display: flex;
     gap: 6px;
@@ -141,6 +178,7 @@
     background: rgba(192, 57, 43, 0.15);
   }
 </style>
+
 
 </head>
 <body>
