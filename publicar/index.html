@@ -90,27 +90,42 @@
   .vfav{width:128px;height:128px;border-radius:50%;background:var(--navy2);border:2px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:46px;font-weight:700;color:var(--green)}
   #vfName{font-size:23px;font-weight:600}#vfState{color:var(--mut);font-size:14px}
   #hang{position:absolute;left:50%;transform:translateX(-50%);bottom:24px;background:var(--red);color:#fff;border:0;border-radius:30px;padding:14px 26px;font-weight:700;font-size:15px;cursor:pointer;z-index:10}
-  #addcall{position:absolute;top:14px;left:14px;z-index:6;background:rgba(0,0,0,.45);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:26px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
-  #callkeys{position:absolute;top:16px;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.55);color:var(--green);border-radius:20px;padding:8px 14px;font-size:13px;font-weight:700;font-family:ui-monospace,monospace;display:none;white-space:nowrap}
-  /* modal */
-  .modal{position:absolute;inset:0;background:rgba(3,10,18,.7);z-index:20;display:none;align-items:center;justify-content:center;padding:18px}
-  .modal.on{display:flex}
-  .card{background:var(--navy2);border:1px solid var(--line);border-radius:16px;padding:18px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto}
-  .card h3{margin:0 0 4px;font-size:18px}
-  .mrow{display:flex;gap:10px;margin-top:16px}
-  .mrow .btn{flex:1}
-  .picklist{margin-top:10px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .pick{display:flex;align-items:center;gap:10px;padding:11px 12px;border-bottom:1px solid rgba(36,69,95,.4);cursor:pointer}
-  .pick:last-child{border-bottom:0}
-  .pick input{width:20px;height:20px;flex:none}
-  /* incoming call */
-  #incall{position:absolute;left:0;right:0;top:0;background:var(--green);color:#04240f;z-index:30;display:none;padding:14px 16px;align-items:center;gap:12px}
-  #incall b{font-size:15px}
-  #incall .sp{flex:1}
-  #incall button{border:0;border-radius:24px;padding:10px 16px;font-weight:700;cursor:pointer;font-size:14px}
-  #incall .acc{background:#04240f;color:#fff}
-  #incall .dec{background:var(--red);color:#fff}
-</style></head><body>
+  #addcall{position:absolute;top:14px;left:14px;z-index:6;background:rgba(0,0,0,.45);color:#fff;border:0;border-radius:50%;width:46px;height:46px;font-size:26px;line-height:1;cursor:pointer}
+
+  /* NUEVOS ESTILOS PARA LOS BOTONES MODIFICAR Y BORRAR */
+  .contact-actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+    flex: none;
+  }
+  .c-btn {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--mut);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.2s ease;
+  }
+  .c-btn:active {
+    transform: scale(0.95);
+  }
+  .c-btn.edit:hover {
+    border-color: var(--green);
+    color: var(--green);
+    background: rgba(33, 195, 111, 0.1);
+  }
+  .c-btn.delete:hover {
+    border-color: var(--red);
+    color: var(--red);
+    background: rgba(192, 57, 43, 0.15);
+  }
+</style>
+</head>
+<body>
 <div class="wrap">
 
   <!-- ONBOARDING -->
@@ -340,6 +355,8 @@ function renderList(){
     el.appendChild(row);
   }
 }
+
+
 function renderNewChat(){
   const q=(document.getElementById('ncSearch').value||'').trim().toLowerCase();
   const el=document.getElementById('ncList');el.innerHTML='';
@@ -350,10 +367,58 @@ function renderNewChat(){
     const cv=convForContact(c);
     const row=document.createElement('div');row.className='row';row.onclick=()=>openChat(cv);
     row.innerHTML='<div class="av">'+initials(c.name)+'</div>'+
-      '<div class="rmid"><div class="rname">'+esc(c.name)+'</div><div class="rprev">'+esc(tail(c.number))+'</div></div>';
+      '<div class="rmid"><div class="rname">'+esc(c.name)+'</div><div class="rprev">'+esc(tail(c.number))+'</div></div>'+
+      '<!-- NUEVOS BOTONES DE ACCIÓN COMPATIBLES CON TU STYLE -->'+
+      '<div class="contact-actions">'+
+        '<button class="c-btn edit" onclick="modificarContacto(\''+c.number+'\', event)">✏️</button>'+
+        '<button class="c-btn delete" onclick="borrarContacto(\''+c.number+'\', event)">🗑️</button>'+
+      '</div>';
     el.appendChild(row);
   });
 }
+
+
+
+/* ================= LOGICA DE MODIFICAR Y BORRAR CONTACTOS ================= */
+function borrarContacto(numero, event) {
+  if (event) event.stopPropagation(); // Evita que se abra la pantalla de chat al hacer clic en borrar
+  
+  if (confirm("¿Estás seguro de que querés eliminar este contacto?")) {
+    // Filtramos el array global 'contacts' usando tu variable actual
+    contacts = contacts.filter(c => c.number !== numero);
+    
+    // Guardamos los cambios usando tu función nativa persistente
+    saveContacts();
+    
+    // Refrescamos las pantallas de inmediato
+    renderNewChat();
+    renderList();
+  }
+}
+
+function modificarContacto(numero, event) {
+  if (event) event.stopPropagation(); // Evita que se abra la pantalla de chat al hacer clic en editar
+  
+  // Buscamos el contacto objetivo dentro de tu array
+  let contacto = contacts.find(c => c.number === numero);
+  if (!contacto) return;
+  
+  // Desplegamos un cuadro de texto con el nombre actual pre-cargado
+  let nuevoNombre = prompt("Modificar nombre del contacto:", contacto.name);
+  
+  if (nuevoNombre && nuevoNombre.trim() !== "") {
+    contacto.name = nuevoNombre.trim();
+    
+    // Guardamos y regeneramos las conversaciones y listas
+    saveContacts();
+    rebuildConvs();
+    renderNewChat();
+    renderList();
+  }
+}
+
+
+
 function esc(s){return (s+'').replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));}
 
 /* ================= CHAT ================= */
