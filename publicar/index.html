@@ -417,23 +417,78 @@ function borrarContacto(numero, event) {
 function modificarContacto(numero, event) {
   if (event) event.stopPropagation(); // Evita que se abra la pantalla de chat al hacer clic en editar
   
-  // Buscamos el contacto objetivo dentro de tu array
+  // 1. Buscamos el contacto objetivo dentro del array
   let contacto = contacts.find(c => c.number === numero);
   if (!contacto) return;
   
-  // Desplegamos un cuadro de texto con el nombre actual pre-cargado
-  let nuevoNombre = prompt("Modificar nombre del contacto:", contacto.name);
+  // 2. Rellenamos los campos del modal con los datos actuales
+  document.getElementById('cName').value = contacto.name;
+  document.getElementById('cNum').value = contacto.number;
   
-  if (nuevoNombre && nuevoNombre.trim() !== "") {
-    contacto.name = nuevoNombre.trim();
+  // 3. Cambiamos el título del modal
+  const modalTitle = document.querySelector('#mContact h3');
+  if (modalTitle) modalTitle.innerText = "Modificar contacto";
+  
+  // 4. Limpiamos errores anteriores
+  const errEl = document.getElementById('cErr');
+  if (errEl) errEl.innerText = '';
+  
+  // 5. Clonamos y reemplazamos el botón "Guardar" del modal para asignarle la lógica de edición única
+  const btnGuardar = document.querySelector('#mContact .btn:not(.ghost)');
+  const nuevoBtnGuardar = btnGuardar.cloneNode(true);
+  btnGuardar.parentNode.replaceChild(nuevoBtnGuardar, btnGuardar);
+  
+  // 6. Programamos la acción del nuevo botón Guardar (Todo acá adentro)
+  nuevoBtnGuardar.onclick = function() {
+    const inputName = document.getElementById('cName').value.trim();
+    const inputNum = document.getElementById('cNum').value.trim();
     
-    // Guardamos y regeneramos las conversaciones y listas
+    if (!inputName || !inputNum) {
+      if (errEl) errEl.innerText = "Completá todos los campos";
+      return;
+    }
+    
+    // Aplicamos los cambios directamente en tu registro
+    contacto.name = inputName;
+    contacto.number = inputNum;
+    
+    // Ejecutamos tus funciones nativas de guardado y refresco
     saveContacts();
     rebuildConvs();
     renderNewChat();
     renderList();
+    
+    // Restauramos el modal a su estado original de creación y lo cerramos
+    restaurarModalContacto();
+  };
+  
+  // 7. Hacemos lo mismo con el botón "Cancelar" para que limpie todo si se arrepienten
+  const btnCancelar = document.querySelector('#mContact .btn.ghost');
+  const nuevoBtnCancelar = btnCancelar.cloneNode(true);
+  btnCancelar.parentNode.replaceChild(nuevoBtnCancelar, btnCancelar);
+  nuevoBtnCancelar.onclick = function() {
+    restaurarModalContacto();
+  };
+  
+  // Función interna para dejar el modal como estaba originalmente
+  function restaurarModalContacto() {
+    document.getElementById('cName').value = '';
+    document.getElementById('cNum').value = '';
+    if (modalTitle) modalTitle.innerText = "Nuevo contacto";
+    if (errEl) errEl.innerText = '';
+    document.getElementById('mContact').classList.remove('on');
+    
+    // Al volver a hacer clic en Cancelar o Guardar la próxima vez, llamará a tu saveContact() original
+    const btnG = document.querySelector('#mContact .btn:not(.ghost)');
+    btnG.onclick = function() { saveContact(); };
+    const btnC = document.querySelector('#mContact .btn.ghost');
+    btnC.onclick = function() { closeModal('mContact'); };
   }
+  
+  // 8. Abrimos el modal en pantalla
+  document.getElementById('mContact').classList.add('on');
 }
+
 
 
 
